@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: treezh-docker.pkg.coding.net/demo03/opentelemetry-public/opentelemetry-operator
-  newTag: v0.42.0-10-g6425e6e
+  newTag: v0.42.0-11-gb301ef3

@@ -2,4 +2,4 @@ namespace: observability
 
 resources:
 - jaeger-operator.yaml
-- node-port.yaml
+#- node-port.yaml
