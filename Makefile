@@ -2,6 +2,10 @@
 VERSION ?= "$(shell git describe --tags | sed 's/^v//')"
 VERSION_DATE ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 VERSION_PKG ?= "github.com/open-telemetry/opentelemetry-operator/internal/version"
+DOCKER_PUB_REPO_PREFIX ?= "treezh-docker.pkg.coding.net/demo03/opentelemetry-public"
+GENERIC_PUB_REPO_PREFIX ?= "https://treezh-generic.pkg.coding.net/demo03/opentelemetry"
+GENERIC_PUB_REPO_USERNAME ?= "username"
+GENERIC_PUB_REPO_PASSWORD ?= "password"
 OTELCOL_VERSION ?= "$(shell grep -v '\#' versions.txt | grep opentelemetry-collector | awk -F= '{print $$2}')"
 OPERATOR_VERSION ?= "$(shell grep -v '\#' versions.txt | grep operator | awk -F= '{print $$2}')"
 TARGETALLOCATOR_VERSION ?= "$(shell grep -v '\#' versions.txt | grep targetallocator | awk -F= '{print $$2}')"
@@ -15,6 +19,10 @@ IMG_PREFIX ?= ghcr.io/${USER}/opentelemetry-operator
 IMG_REPO ?= opentelemetry-operator
 IMG ?= ${IMG_PREFIX}/${IMG_REPO}:$(addprefix v,${VERSION})
 BUNDLE_IMG ?= ${IMG_PREFIX}/${IMG_REPO}-bundle:${VERSION}
+DOCKER_PUB_IMG ?= ${DOCKER_PUB_REPO_PREFIX}/${IMG_REPO}:$(addprefix v,${VERSION})
+GENERIC_PUB_REPO ?= opentelemetry-operator.yaml
+GENERIC_PUB_IMG ?= {GENERIC_PUB_REPO_PREFIX}/${GENERIC_PUB_REPO}?version=$(addprefix v,${VERSION})
+
 
 # Options for 'bundle-build'
 ifneq ($(origin CHANNELS), undefined)
@@ -98,6 +106,21 @@ undeploy: set-image-controller
 release-artifacts: set-image-controller
 	mkdir -p dist
 	$(KUSTOMIZE) build config/default -o dist/opentelemetry-operator.yaml
+
+# Generates the released manifests
+release-artifacts-demo: set-image-controller
+	mkdir -p dist
+	$(KUSTOMIZE) build config/demo -o dist/otel-all-in-one-operator.yaml
+
+set-pub-image-vars:
+	$(eval IMG=${DOCKER_PUB_IMG})
+
+push-manager: set-pub-image-vars container container-push
+
+push-operator: set-pub-image-vars set-image-controller release-artifacts-demo
+	curl -T dist/opentelemetry-operator.yaml -u ${GENERIC_PUB_REPO_USERNAME}:${GENERIC_PUB_REPO_PASSWORD} 'https://treezh-generic.pkg.coding.net/demo03/opentelemetry/opentelemetry-operator.yaml?version='$(addprefix v,${VERSION})
+
+demo-operator: set-pub-image-vars set-image-controller release-artifacts-demo
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen

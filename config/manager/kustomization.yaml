@@ -1,2 +1,8 @@
 resources:
-  - manager.yaml
+- manager.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: controller
+  newName: treezh-docker.pkg.coding.net/demo03/opentelemetry-public/opentelemetry-operator
+  newTag: v0.42.0-8-ga8a4d80

@@ -1,0 +1,5 @@
+namespace: observability
+
+resources:
+- jaeger-operator.yaml
+- node-port.yaml
