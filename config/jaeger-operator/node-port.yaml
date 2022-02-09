@@ -6,15 +6,15 @@ metadata:
 spec:
   ports:
     - name: http-query
+      protocol: TCP
       port: 16686
-      protocol: TCP
       targetPort: 16686
-      nodePort: 16686
+      nodePort: 32686
     - name: grpc-query
-      port: 16685
       protocol: TCP
+      port: 16685
       targetPort: 16685
-      nodePort: 16686
+      nodePort: 32685
   selector:
     app: jaeger
     app.kubernetes.io/component: all-in-one
