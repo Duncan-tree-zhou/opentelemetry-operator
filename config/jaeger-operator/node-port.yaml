@@ -9,10 +9,12 @@ spec:
       port: 16686
       protocol: TCP
       targetPort: 16686
+      nodePort: 16686
     - name: grpc-query
       port: 16685
       protocol: TCP
       targetPort: 16685
+      nodePort: 16686
   selector:
     app: jaeger
     app.kubernetes.io/component: all-in-one

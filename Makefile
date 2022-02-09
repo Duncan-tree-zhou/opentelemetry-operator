@@ -20,8 +20,8 @@ IMG_REPO ?= opentelemetry-operator
 IMG ?= ${IMG_PREFIX}/${IMG_REPO}:$(addprefix v,${VERSION})
 BUNDLE_IMG ?= ${IMG_PREFIX}/${IMG_REPO}-bundle:${VERSION}
 DOCKER_PUB_IMG ?= ${DOCKER_PUB_REPO_PREFIX}/${IMG_REPO}:$(addprefix v,${VERSION})
-GENERIC_PUB_REPO ?= opentelemetry-operator.yaml
-GENERIC_PUB_IMG ?= {GENERIC_PUB_REPO_PREFIX}/${GENERIC_PUB_REPO}?version=$(addprefix v,${VERSION})
+GENERIC_PUB_FILE ?= otel-all-in-one-operator.yaml
+GENERIC_PUB_URL ?= ${GENERIC_PUB_REPO_PREFIX}/${GENERIC_PUB_FILE}?version=$(addprefix v,${VERSION})
 
 
 # Options for 'bundle-build'
@@ -110,7 +110,7 @@ release-artifacts: set-image-controller
 # Generates the released manifests
 release-artifacts-demo: set-image-controller
 	mkdir -p dist
-	$(KUSTOMIZE) build config/demo -o dist/otel-all-in-one-operator.yaml
+	$(KUSTOMIZE) build config/demo -o dist/${GENERIC_PUB_FILE}
 
 set-pub-image-vars:
 	$(eval IMG=${DOCKER_PUB_IMG})
@@ -118,7 +118,7 @@ set-pub-image-vars:
 push-manager: set-pub-image-vars container container-push
 
 push-operator: set-pub-image-vars set-image-controller release-artifacts-demo
-	curl -T dist/opentelemetry-operator.yaml -u ${GENERIC_PUB_REPO_USERNAME}:${GENERIC_PUB_REPO_PASSWORD} 'https://treezh-generic.pkg.coding.net/demo03/opentelemetry/opentelemetry-operator.yaml?version='$(addprefix v,${VERSION})
+	curl -T dist/${GENERIC_PUB_FILE} -u ${GENERIC_PUB_REPO_USERNAME}:${GENERIC_PUB_REPO_PASSWORD} ${GENERIC_PUB_URL}
 
 demo-operator: set-pub-image-vars set-image-controller release-artifacts-demo
 
